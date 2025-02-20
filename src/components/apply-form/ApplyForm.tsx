@@ -13,6 +13,7 @@ const ApplyForm = () => {
   const formMethods = useForm({
     resolver: zodResolver<FormField>(formSchema),
     defaultValues: defaultForm,
+    mode: 'onBlur',
   });
 
   const {
@@ -31,19 +32,32 @@ const ApplyForm = () => {
     onError: () => toast(ERROR_COMMNETS.SUBMIT_FAILED),
   });
 
-  if (isPending) {
-    return <BounceDot option={{ size: 12 }} />;
-  }
+  // if (isPending) {
+  //   return <BounceDot option={{ size: 12 }} />;
+  // }
 
-  if (isSuccess) {
-    return <Completion />;
-  }
+  // if (isSuccess) {
+  //   return <Completion />;
+  // }
 
   return (
     <>
       <FormProvider {...formMethods}>
-        <form onSubmit={formMethods.handleSubmit((data) => submitData(data))}>
-          <ApplyFunnel />
+        <form
+          onSubmit={formMethods.handleSubmit((data) => submitData(data))}
+          className="w-2xl  flex flex-col justify-center items-center gap-6"
+        >
+          <div className="flex justify-center items-center w-full h-24 bg-white rounded-md shadow-sm">
+            <h2 className="font-bold text-2xl ">Prography 10기 지원서</h2>
+          </div>
+
+          {isSuccess && <Completion />}
+          {isPending && (
+            <div className="w-full  top-0 z-10 bg-white  h-82 flex justify-center items-center">
+              <BounceDot option={{ size: 20 }} />
+            </div>
+          )}
+          {!isSuccess && !isPending && <ApplyFunnel />}
         </form>
       </FormProvider>
     </>

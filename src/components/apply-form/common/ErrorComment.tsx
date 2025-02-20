@@ -4,7 +4,7 @@ interface ErrorCommentProps {
   children: ReactNode;
 }
 const ErrorComment = ({ children }: ErrorCommentProps) => {
-  return <p style={{ color: 'red' }}>{children}</p>;
+  return <p className="text-red-500 text-xs">{children}</p>;
 };
 
 export default ErrorComment;
