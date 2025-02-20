@@ -5,7 +5,7 @@ import { PAGE } from '../../constants/page';
 const Home = () => {
   return (
     <>
-      <main className="flex flex-col items-center gap-10 text-center">
+      <main className="flex flex-col items-center  justify-center gap-10 text-center p-12 bg-white rounded-2xl  w-full min-w-96 h-full">
         <div className="flex justify-start">
           <img src={Logo} alt="prography logo" />
         </div>
