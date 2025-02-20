@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import Logo from '../../assets/logo.png';
+import { PAGE } from '../../constants/page';
 
 const Home = () => {
   return (
@@ -14,8 +15,10 @@ const Home = () => {
         <div>
           <p>드디어 Prography 10기 모집이 시작되었습니다.</p>
         </div>
-        <button className="rounded-md bg-blue-500 text-white p-3">
-          <Link to={'/applyform'}>지원하기</Link>
+        <button className="rounded-md bg-blue-500 text-white p-3" type="button">
+          <Link to={`/${PAGE.APPLY_FORM}`} replace={false}>
+            지원하기
+          </Link>
         </button>
       </main>
     </>

@@ -3,9 +3,10 @@
 // import viteLogo from '/vite.svg';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import './App.css';
-import Home from './components/home/Home';
-import ApplyForm from './components/apply-form/ApplyForm';
+
 import { PAGE } from './constants/page';
+import HomePage from './pages/HomePage';
+import ApplyFormPage from './pages/ApplyFormPage';
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -14,8 +15,8 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route index element={<Home />} />
-          <Route path={`/${PAGE.ApplyForm}`} element={<ApplyForm />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path={`/${PAGE.APPLY_FORM}`} element={<ApplyFormPage />} />
         </Routes>
       </BrowserRouter>
       {/* <div>
