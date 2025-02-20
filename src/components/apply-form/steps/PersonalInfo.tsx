@@ -1,32 +1,12 @@
-import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
+import ErrorComment from '../common/ErrorComment';
 
-interface PersonalInfoProps {
-  onNext: () => void;
-  context: object;
-}
-
-const PersonalInfo = ({ onNext, context }: PersonalInfoProps) => {
+const PersonalInfo = () => {
   const {
     register,
     formState: { errors },
-    getValues,
-    reset,
-    setValue,
-    trigger,
   } = useFormContext();
 
-  console.log('PersonalInfo에서 폼: ', getValues());
-  // useEffect(() => {
-  //   console.log('context: ', context);
-  //   // reset(context);
-
-  //   Object.entries(context).forEach(([key, value]) => {
-  //     setValue(key, value);
-  //   });
-
-  //   console.log('펄스널, 유즈이페트');
-  // }, []);
   return (
     <>
       <div>
@@ -53,22 +33,8 @@ const PersonalInfo = ({ onNext, context }: PersonalInfoProps) => {
         </fieldset>
 
         {errors.personalInfo && (
-          <p style={{ color: 'red' }}>
-            {errors.personalInfo?.message as string}
-          </p>
+          <ErrorComment>{errors.personalInfo?.message as string}</ErrorComment>
         )}
-      </div>
-      <div>
-        <button
-          type="button"
-          onClick={async () => {
-            const isValid = await trigger('personalInfo');
-            if (isValid) onNext();
-            // onNext();
-          }}
-        >
-          다음
-        </button>
       </div>
     </>
   );

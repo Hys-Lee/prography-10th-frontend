@@ -1,3 +1,3 @@
-const PAGE = { ApplyForm: 'applyform' };
+const PAGE = { APPLY_FORM: 'applyform' };
 
 export { PAGE };

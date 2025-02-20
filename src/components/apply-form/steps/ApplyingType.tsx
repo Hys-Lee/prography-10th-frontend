@@ -1,29 +1,11 @@
-import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
+import ErrorComment from '../common/ErrorComment';
 
-interface ApplyingTypeProps {
-  onPrev: () => void;
-  prevValidate: () => Promise<void>;
-  context: object;
-}
-
-const ApplyingType = ({ context, onPrev, prevValidate }: ApplyingTypeProps) => {
-  const { register, getValues, reset } = useFormContext();
-  // useEffect(() => {
-  //   reset({ ...context, applyingType: getValues('applyingType') });
-
-  //   const getPrevValidation = async () => await prevValidate();
-  //   if (!getPrevValidation) {
-  //     onPrev();
-  //   }
-  // }, []);
-
-  useEffect(() => {
-    prevValidate();
-    // reset(context);
-  }, []);
-
-  console.log('어플랑에서 폼: ', getValues());
+const ApplyingType = () => {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
 
   return (
     <>
@@ -87,11 +69,9 @@ const ApplyingType = ({ context, onPrev, prevValidate }: ApplyingTypeProps) => {
             <label>Product Owner</label>
           </div>
         </fieldset>
-      </div>
-      <div>
-        <button type="button" onClick={onPrev}>
-          이전
-        </button>
+        {errors?.applyingType && (
+          <ErrorComment>{errors.applyingType.message as string}</ErrorComment>
+        )}
       </div>
     </>
   );
