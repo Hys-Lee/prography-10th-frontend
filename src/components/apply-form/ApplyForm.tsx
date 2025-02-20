@@ -53,7 +53,7 @@ const ApplyForm = () => {
 
           {isSuccess && <Completion />}
           {isPending && (
-            <div className="w-full  top-0 z-10 bg-white  h-82 flex justify-center items-center">
+            <div className="w-full  top-0 z-10 bg-white  h-82 flex justify-center items-center shadow-sm">
               <BounceDot option={{ size: 20 }} />
             </div>
           )}
