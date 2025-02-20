@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import Logo from '../../assets/logo.png';
+import Logo from '../../assets/images/logo.png';
 import { PAGE } from '../../constants/page';
 
 const Home = () => {
