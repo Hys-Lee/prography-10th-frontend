@@ -7,13 +7,14 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import StepLayout from './steps/StepLayout';
 import { ERROR_COMMNETS } from '../../constants/errorComments';
+import { toast } from 'react-toastify';
 
 const formSchema = z.object({
   personalInfo: z
     .enum(['agree', 'disagree'], { message: ERROR_COMMNETS.NON_CHECK })
     .refine(
       (value) => (value === 'agree' ? true : false),
-      '동의 시 진행 가능합니다'
+      ERROR_COMMNETS.SHOULD_AGREE
     ),
   name: z
     .string({ message: ERROR_COMMNETS.EMPTY_STRING })
@@ -71,6 +72,7 @@ const ApplyForm = () => {
   });
 
   const onSubmit = (data: unknown) => console.log(data);
+  // const onSubmitFailed = () => toast(ERROR_COMMNETS.SUBMIT_FAILED); // post 동작에 사용
 
   return (
     <>
@@ -117,7 +119,8 @@ const ApplyForm = () => {
                     context.personalInfo ===
                     formMethods.getValues('personalInfo');
                   if (!isFormValid || !isFormEqualToContext) {
-                    alert('다시 작성하고 다음 버튼 클릭하세욧!');
+                    toast(ERROR_COMMNETS.INVALID_PROCESS);
+                    // alert('다시 작성하고 다음 버튼 클릭하세욧!');
                     history.back();
                     return;
                   }
@@ -146,7 +149,8 @@ const ApplyForm = () => {
                     );
                   }, true);
                   if (!isFormValid || !isFormEqualToContext) {
-                    alert('다시 작성하세욧!');
+                    toast(ERROR_COMMNETS.INVALID_PROCESS);
+                    // alert('다시 작성하세욧!');
                     history.back();
                     return;
                   }
