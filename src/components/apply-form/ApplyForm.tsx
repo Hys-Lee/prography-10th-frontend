@@ -5,59 +5,42 @@ import BasicInfo from './steps/BasicInfo';
 import ApplyingType from './steps/ApplyingType';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import _ from 'lodash';
+import StepLayout from './steps/StepLayout';
+import { ERROR_COMMNETS } from '../../constants/errorComments';
 
 const formSchema = z.object({
   personalInfo: z
-    // .preprocess((value) => {
-    //   if (value === undefined || value === null) return false;
-    //   return value === 'agree';
-    // }, z.boolean())
-    .enum(['agree', 'disagree'], { message: '선택은 하셔야죠' })
+    .enum(['agree', 'disagree'], { message: ERROR_COMMNETS.NON_CHECK })
     .refine(
       (value) => (value === 'agree' ? true : false),
-      '찬성하셔야만 합니다'
+      '동의 시 진행 가능합니다'
     ),
   name: z
-    .string({ message: '이름 안적었음' })
-    .optional()
-    // .nonempty()
+    .string({ message: ERROR_COMMNETS.EMPTY_STRING })
+    // .optional()
     .refine(
       (value) => typeof value === 'string' && value.length > 0,
-      '이름 적으라고'
+      ERROR_COMMNETS.EMPTY_STRING
     ),
   email: z
-    .string({ message: '이메일 안적었어여' })
-    .nonempty({ message: '입력하셔야만 합니다' })
-    .email('이메일 형식으로다가')
-    .optional()
-    .refine((value) => value !== undefined, '입력 하셔야 한다구요 이메일'),
+    .string({ message: ERROR_COMMNETS.EMPTY_STRING })
+    .nonempty({ message: ERROR_COMMNETS.EMPTY_STRING })
+    .email(ERROR_COMMNETS.INVALID_TYPE)
+    // .optional()
+    .refine((value) => value !== undefined, ERROR_COMMNETS.EMPTY_STRING),
   phoneNumber: z
-    .string({ message: '전번 적으셔야해요' })
-    .nonempty({ message: '입력하셔야만 해요' })
-    .regex(/^\d{3}-\d{4}-\d{4}$/, '형식 맞추셈')
-    .optional(),
-  applyingType: z
-    .enum(['frontend', 'backend', 'design', 'ios', 'android', 'productOwner'])
-    .optional(),
+    .string({ message: ERROR_COMMNETS.EMPTY_STRING })
+    .nonempty({ message: ERROR_COMMNETS.EMPTY_STRING })
+    .regex(/^\d{3}-\d{4}-\d{4}$/, ERROR_COMMNETS.INVALID_TYPE)
+    // .optional()
+    .refine((value) => value !== undefined, ERROR_COMMNETS.EMPTY_STRING),
+  applyingType: z.enum(
+    ['frontend', 'backend', 'design', 'ios', 'android', 'productOwner'],
+    { message: ERROR_COMMNETS.NON_CHECK }
+  ),
 });
 
-// type FormState = {
-//   personalInfo?: boolean;
-//   name?: string;
-//   email?: string;
-//   phoneNumber?: string;
-//   applyingType?:
-//     | 'frontend'
-//     | 'backend'
-//     | 'design'
-//     | 'ios'
-//     | 'android'
-//     | 'productOwner';
-// };
-
 export type FormField = Partial<z.infer<typeof formSchema>>;
-// export type FormField = z.infer<typeof formSchema>;
 
 const defaultForm: FormField = {
   personalInfo: undefined,
@@ -66,7 +49,6 @@ const defaultForm: FormField = {
   phoneNumber: undefined,
   applyingType: undefined,
 };
-
 const steps = createFunnelSteps<FormField>()
   .extends('personalInfo')
   .extends('basicInfo', { requiredKeys: 'personalInfo' })
@@ -87,63 +69,39 @@ const ApplyForm = () => {
     resolver: zodResolver<FormField>(formSchema),
     defaultValues: defaultForm,
   });
-  const {
-    formState: { errors },
-  } = formMethods;
-  const onSubmit = (data: unknown) => console.log(data);
-  //
 
-  //test
-  console.log('여기서에러: ', errors);
+  const onSubmit = (data: unknown) => console.log(data);
 
   return (
     <>
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <funnel.Render
-            personalInfo={({ context, history }) => (
-              <PersonalInfo
-                context={context}
-                onNext={() => {
-                  console.log('다음 실행은 하는거지?');
-                  history.push('basicInfo', {
-                    personalInfo: 'agree',
-                  });
-                }}
-              />
-            )}
-            basicInfo={({ context, history, historySteps, index }) => (
-              <BasicInfo
-                context={context}
-                prevValidate={async () => {
-                  const isValid = await formMethods.trigger('personalInfo');
-                  const isEqual =
-                    context.personalInfo ===
-                    formMethods.getValues('personalInfo');
-                  if (!isValid || !isEqual) {
-                    console.log(
-                      'isValid, isDifferent: ',
-                      isValid,
-                      isEqual,
-                      context,
-                      formMethods.getValues()
-                    );
-                    alert('다시 작성하고 다음 버튼 클릭하세욧!');
-                    history.back();
-                    return;
-                  }
-                  // formMethods.reset(context);
-                }}
-                onPrev={() => {
-                  history.back();
-                }}
+            personalInfo={({ history, index }) => (
+              <StepLayout
+                stepIndex={index}
                 onNext={async () => {
-                  const isValid = await formMethods.trigger([
+                  const isValid = await formMethods.trigger('personalInfo');
+                  if (isValid) {
+                    history.push('basicInfo', {
+                      personalInfo: formMethods.getValues('personalInfo')!,
+                    });
+                  }
+                }}
+              >
+                <PersonalInfo />
+              </StepLayout>
+            )}
+            basicInfo={({ context, history, index }) => (
+              <StepLayout
+                stepIndex={index}
+                onNext={async () => {
+                  const isFormValid = await formMethods.trigger([
                     'name',
                     'email',
                     'phoneNumber',
                   ]);
-                  if (isValid) {
+                  if (isFormValid) {
                     history.push('applyingType', (prev) => ({
                       ...prev,
                       name: formMethods.getValues('name')!,
@@ -152,33 +110,50 @@ const ApplyForm = () => {
                     }));
                   }
                 }}
-              />
-            )}
-            applyingType={({ context, history }) => (
-              <ApplyingType
-                context={context}
                 onPrev={() => history.back()}
-                prevValidate={async () => {
+                preValidate={async () => {
+                  const isFormValid = await formMethods.trigger('personalInfo');
+                  const isFormEqualToContext =
+                    context.personalInfo ===
+                    formMethods.getValues('personalInfo');
+                  if (!isFormValid || !isFormEqualToContext) {
+                    alert('다시 작성하고 다음 버튼 클릭하세욧!');
+                    history.back();
+                    return;
+                  }
+                }}
+              >
+                <BasicInfo />
+              </StepLayout>
+            )}
+            applyingType={({ context, history, index }) => (
+              <StepLayout
+                isSubmit
+                stepIndex={index}
+                onPrev={() => history.back()}
+                preValidate={async () => {
                   const target = ['name', 'email', 'phoneNumber'];
-                  const isValid = await formMethods.trigger(
+
+                  const isFormValid = await formMethods.trigger(
                     target as (keyof FormField)[]
                   );
 
-                  const isEqual = target.reduce((acc, cur) => {
+                  const isFormEqualToContext = target.reduce((acc, cur) => {
                     return (
                       acc &&
                       context[cur as keyof FormField] ===
                         formMethods.getValues(cur as keyof FormField)
                     );
                   }, true);
-                  if (!isValid || !isEqual) {
-                    // alert('다시 작성하세욧!');
+                  if (!isFormValid || !isFormEqualToContext) {
+                    alert('다시 작성하세욧!');
                     history.back();
                     return;
                   }
-                  // formMethods.reset(context);
                 }}
-              />
+              >
+                <ApplyingType />
+              </StepLayout>
             )}
           />
         </form>
