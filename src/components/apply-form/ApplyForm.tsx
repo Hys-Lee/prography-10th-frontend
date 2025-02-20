@@ -8,6 +8,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import StepLayout from './steps/StepLayout';
 import { ERROR_COMMNETS } from '../../constants/errorComments';
 import { toast } from 'react-toastify';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import { BounceDot } from 'basic-loading';
+import { size } from 'lodash';
+import Completion from './steps/Completion';
 
 const formSchema = z.object({
   personalInfo: z
@@ -71,13 +76,37 @@ const ApplyForm = () => {
     defaultValues: defaultForm,
   });
 
-  const onSubmit = (data: unknown) => console.log(data);
+  // const onSubmit = (data: unknown) => mutate(data);
   // const onSubmitFailed = () => toast(ERROR_COMMNETS.SUBMIT_FAILED); // post 동작에 사용
+
+  const {
+    isPending,
+    isSuccess,
+    mutate: submitData,
+  } = useMutation({
+    mutationFn: (data: FormField) => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          console.log(data);
+          resolve({ status: 200 });
+        }, 2000);
+      });
+    },
+    onError: () => toast(ERROR_COMMNETS.SUBMIT_FAILED),
+  });
+
+  if (isPending) {
+    return <BounceDot option={{ size: 12 }} />;
+  }
+
+  if (isSuccess) {
+    return <Completion />;
+  }
 
   return (
     <>
       <FormProvider {...formMethods}>
-        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+        <form onSubmit={formMethods.handleSubmit((data) => submitData(data))}>
           <funnel.Render
             personalInfo={({ history, index }) => (
               <StepLayout
