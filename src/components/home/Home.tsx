@@ -36,7 +36,7 @@ const Home = () => {
           </Link>
         </section>
         <button className="rounded-md bg-blue-500 text-white p-3">
-          <Link to={'/applyform'}>지원하기</Link>
+          <Link to={`/${PAGE.APPLY_FORM}`}>지원하기</Link>
         </button>
       </main>
     </>
